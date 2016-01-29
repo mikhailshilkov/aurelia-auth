@@ -37,7 +37,7 @@ var Authentication = (function () {
   }, {
     key: 'getLoginRedirect',
     value: function getLoginRedirect() {
-      return this.config.loginRedirect;
+      return this.initialUrl || this.config.loginRedirect;
     }
   }, {
     key: 'getLoginUrl',
@@ -76,6 +76,11 @@ var Authentication = (function () {
       }
     }
   }, {
+    key: 'setInitialUrl',
+    value: function setInitialUrl(url) {
+      this.initialUrl = url;
+    }
+  }, {
     key: 'setToken',
     value: function setToken(response, redirect) {
 
@@ -104,7 +109,7 @@ var Authentication = (function () {
       this.storage.set(tokenName, token);
 
       if (this.config.loginRedirect && !redirect) {
-        window.location.href = this.config.loginRedirect;
+        window.location.href = this.getLoginRedirect();
       } else if (redirect && _authUtils2['default'].isString(redirect)) {
         window.location.href = window.encodeURI(redirect);
       }

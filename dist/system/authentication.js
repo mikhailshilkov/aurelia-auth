@@ -35,7 +35,7 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
         }, {
           key: 'getLoginRedirect',
           value: function getLoginRedirect() {
-            return this.config.loginRedirect;
+            return this.initialUrl || this.config.loginRedirect;
           }
         }, {
           key: 'getLoginUrl',
@@ -74,6 +74,11 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
             }
           }
         }, {
+          key: 'setInitialUrl',
+          value: function setInitialUrl(url) {
+            this.initialUrl = url;
+          }
+        }, {
           key: 'setToken',
           value: function setToken(response, redirect) {
 
@@ -102,7 +107,7 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
             this.storage.set(tokenName, token);
 
             if (this.config.loginRedirect && !redirect) {
-              window.location.href = this.config.loginRedirect;
+              window.location.href = this.getLoginRedirect();
             } else if (redirect && authUtils.isString(redirect)) {
               window.location.href = window.encodeURI(redirect);
             }
