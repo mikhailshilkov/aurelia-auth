@@ -35,7 +35,7 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
         }, {
           key: 'getLoginRedirect',
           value: function getLoginRedirect() {
-            return this.config.loginRedirect;
+            return this.initialUrl || this.config.loginRedirect;
           }
         }, {
           key: 'getLoginUrl',
@@ -65,7 +65,14 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
             if (token && token.split('.').length === 3) {
               var base64Url = token.split('.')[1];
               var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-              return JSON.parse(decodeURIComponent(escape(window.atob(base64))));
+
+              try {
+                var _parsed = JSON.parse(decodeURIComponent(escape(window.atob(base64))));
+              } catch (error) {
+                return;
+              }
+
+              return parsed;
             }
           }
         }, {
@@ -97,10 +104,15 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
             this.storage.set(tokenName, token);
 
             if (this.config.loginRedirect && !redirect) {
-              window.location.href = this.config.loginRedirect;
+              window.location.href = this.getLoginRedirect();
             } else if (redirect && authUtils.isString(redirect)) {
               window.location.href = window.encodeURI(redirect);
             }
+          }
+        }, {
+          key: 'setInitialUrl',
+          value: function setInitialUrl(url) {
+            this.initialUrl = url;
           }
         }, {
           key: 'removeToken',
@@ -120,9 +132,13 @@ System.register(['aurelia-framework', './baseConfig', './storage', './authUtils'
               return true;
             }
 
-            var base64Url = token.split('.')[1];
-            var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            var exp = JSON.parse(window.atob(base64)).exp;
+            try {
+              var base64Url = token.split('.')[1];
+              var base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+              var _exp = JSON.parse(window.atob(base64)).exp;
+            } catch (error) {
+              return false;
+            }
 
             if (exp) {
               return Math.round(new Date().getTime() / 1000) <= exp;
