@@ -16,7 +16,7 @@ export class Authentication {
   }
 
   getLoginRedirect() {
-    return this.initialPage || this.config.loginRedirect;
+    return this.initialUrl || this.config.loginRedirect;
   }
 
   getLoginUrl() {
@@ -81,14 +81,14 @@ export class Authentication {
     this.storage.set(tokenName, token);
 
     if (this.config.loginRedirect && !redirect) {
-      window.location.href = this.config.loginRedirect;
+      window.location.href = this.getLoginRedirect();
     } else if (redirect && authUtils.isString(redirect)) {
       window.location.href = window.encodeURI(redirect);
     }
   }
 
-  setInitialPage(page) {
-    this.initialPage = page;
+  setInitialUrl(url) {
+    this.initialUrl = url;
   }
 
   removeToken() {
